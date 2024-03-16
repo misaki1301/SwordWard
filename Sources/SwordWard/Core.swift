@@ -52,14 +52,14 @@ open class Core {
 				break
 		}
 		
-		var (data, response) = await try URLSession.shared.data(for: request)
+		var (data, response) = try await URLSession.shared.data(for: request)
 		if let res = response as? HTTPURLResponse, res.statusCode != 200 {
 			throw SwordWardError.invalidResponse
 		}
 		
 		do {
 			let decoder = JSONDecoder()
-			decoder.keyDecodingStrategy = .convertFromSnakeCase
+			//decoder.keyDecodingStrategy = .convertFromSnakeCase
 			let value = try decoder.decode(Nameless.self, from: data)
 			return .success(value)
 		} catch {
