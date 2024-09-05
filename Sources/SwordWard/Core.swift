@@ -39,9 +39,14 @@ open class Core {
 	
 	private init() {}
 	
-	open func request<Nameless: Decodable>(_ url: URL, method: Method, type: ContentType = .json, body: Data?) async throws -> Result<Nameless, Error> {
+	open func request<Nameless: Decodable>(_ url: URL, method: Method, type: ContentType = .json, body: Data?, authHeader: String? = nil) async throws -> Result<Nameless, Error> {
 		
 		var request = URLRequest(url: url)
+		
+		if let authHeader {
+			request.setValue("auth", forHTTPHeaderField: authHeader)
+		}
+		
 		request.httpMethod = method.rawValue
 		request.setValue(type.rawValue, forHTTPHeaderField: contentType)
 		
