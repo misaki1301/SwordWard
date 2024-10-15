@@ -29,9 +29,13 @@ public enum Method: String {
 
 public enum ContentType: String {
 	case json = "application/json"
+	case github = "application/vnd.github+json"
 }
 
 let contentType = "Content-Type"
+let authorization = "Authorization"
+let accept = "Accept"
+let githubVersion = "X-GitHub-Api-Version"
 
 open class Core {
 	
@@ -39,12 +43,24 @@ open class Core {
 	
 	private init() {}
 	
-	open func request<Nameless: Decodable>(_ url: URL, method: Method, type: ContentType = .json, body: Data?, authHeader: String? = nil) async throws -> Result<Nameless, Error> {
+	open func request<Nameless: Decodable>(
+		_ url: URL,
+		method: Method,
+		type: ContentType = .json,
+		body: Data? = nil,
+		authHeader: String? = nil,
+		githubMode: Bool = false
+	) async throws -> Result<Nameless, Error> {
 		
 		var request = URLRequest(url: url)
 		
 		if let authHeader {
-			request.setValue("auth", forHTTPHeaderField: authHeader)
+			request.setValue("Bearer \(authHeader)", forHTTPHeaderField: authorization)
+		}
+		
+		if githubMode {
+			request.setValue("2022-11-28", forHTTPHeaderField: githubVersion)
+			request.setValue(ContentType.github.rawValue, forHTTPHeaderField: accept)
 		}
 		
 		request.httpMethod = method.rawValue
